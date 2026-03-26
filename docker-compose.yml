@@ -1,0 +1,39 @@
+services:
+  claude:
+    build: .
+    container_name: claude-code
+    restart: unless-stopped
+
+    # Geef toegang tot Tailscale netwerk kernel module
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    devices:
+      - /dev/net/tun
+
+    ports:
+      - "2222:22"       # SSH: verbind via  ssh claude@localhost -p 2222
+
+    volumes:
+      - workspace:/workspace          # Persistente werkmap
+      - tailscale-state:/var/lib/tailscale
+
+    environment:
+      # === VERPLICHT ===
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+
+      # === SSH toegang (kies één of beide) ===
+      SSH_PASSWORD: ${SSH_PASSWORD:-}           # Wachtwoord login
+      SSH_PUBLIC_KEY: ${SSH_PUBLIC_KEY:-}       # Sleutelloze login (aanbevolen)
+
+      # === Git identiteit ===
+      GIT_USER_NAME: ${GIT_USER_NAME:-}
+      GIT_USER_EMAIL: ${GIT_USER_EMAIL:-}
+
+      # === Tailscale (optioneel) ===
+      TAILSCALE_AUTH_KEY: ${TAILSCALE_AUTH_KEY:-}
+      TAILSCALE_HOSTNAME: ${TAILSCALE_HOSTNAME:-claude-docker}
+
+volumes:
+  workspace:
+  tailscale-state:
