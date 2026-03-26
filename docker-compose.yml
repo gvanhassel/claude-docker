@@ -13,6 +13,7 @@ services:
 
     ports:
       - "2222:22"       # SSH: verbind via  ssh claude@localhost -p 2222
+      - "7681:7681"     # ttyd: browser-terminal via http://localhost:7681
 
     volumes:
       - workspace:/workspace          # Persistente werkmap
