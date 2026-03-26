@@ -34,8 +34,10 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 # Claude Code
 RUN npm install -g @anthropic-ai/claude-code
 
-# Create user
-RUN groupadd --gid $USER_GID $USERNAME \
+# Create user (verwijder eerst de standaard ubuntu user van Ubuntu 24.04)
+RUN userdel -r ubuntu 2>/dev/null || true \
+    && groupdel ubuntu 2>/dev/null || true \
+    && groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m -s /bin/bash $USERNAME \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
@@ -56,6 +58,13 @@ RUN mkdir -p /home/$USERNAME/.ssh \
 # Werkmap
 RUN mkdir -p /workspace && chown $USERNAME:$USERNAME /workspace
 WORKDIR /workspace
+
+# Claude Code configuratie — CLAUDE.md en skills
+RUN mkdir -p /home/$USERNAME/.claude/commands
+COPY CLAUDE.md /workspace/CLAUDE.md
+COPY .claude/commands/literatuur.md /home/$USERNAME/.claude/commands/literatuur.md
+RUN chown -R $USERNAME:$USERNAME /home/$USERNAME/.claude \
+    && chown $USERNAME:$USERNAME /workspace/CLAUDE.md
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
