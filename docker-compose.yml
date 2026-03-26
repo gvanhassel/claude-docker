@@ -31,6 +31,9 @@ services:
       GIT_USER_NAME: ${GIT_USER_NAME:-}
       GIT_USER_EMAIL: ${GIT_USER_EMAIL:-}
 
+      # === GitHub token (voor gh CLI en git push zonder login) ===
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+
       # === Tailscale (optioneel) ===
       TAILSCALE_AUTH_KEY: ${TAILSCALE_AUTH_KEY:-}
       TAILSCALE_HOSTNAME: ${TAILSCALE_HOSTNAME:-claude-docker}
