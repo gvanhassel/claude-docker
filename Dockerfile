@@ -59,6 +59,11 @@ RUN mkdir /var/run/sshd \
 # Tailscale (optioneel — alleen actief als TAILSCALE_AUTH_KEY is meegegeven)
 RUN curl -fsSL https://tailscale.com/install.sh | sh
 
+# ttyd — browser-terminal op poort 7681
+RUN curl -fsSL https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64 \
+        -o /usr/local/bin/ttyd \
+    && chmod +x /usr/local/bin/ttyd
+
 # SSH authorized_keys dir voor de gebruiker
 RUN mkdir -p /home/$USERNAME/.ssh \
     && chmod 700 /home/$USERNAME/.ssh \

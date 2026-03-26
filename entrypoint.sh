@@ -35,6 +35,10 @@ if [ -n "$TAILSCALE_AUTH_KEY" ]; then
     echo "[entrypoint] Tailscale verbonden"
 fi
 
+# ttyd starten op poort 7681 (browser-terminal)
+echo "[entrypoint] ttyd starten op poort 7681..."
+su - claude -c "ttyd --port 7681 --writable bash" &
+
 # SSH daemon starten
 echo "[entrypoint] SSH server starten op poort 22..."
 /usr/sbin/sshd -D
