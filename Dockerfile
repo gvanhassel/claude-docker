@@ -59,12 +59,11 @@ RUN mkdir -p /home/$USERNAME/.ssh \
 RUN mkdir -p /workspace && chown $USERNAME:$USERNAME /workspace
 WORKDIR /workspace
 
-# Claude Code configuratie — CLAUDE.md en skills
+# Claude Code configuratie — globale CLAUDE.md en skills
 RUN mkdir -p /home/$USERNAME/.claude/commands
-COPY CLAUDE.md /workspace/CLAUDE.md
+COPY CLAUDE.md /home/$USERNAME/.claude/CLAUDE.md
 COPY .claude/commands/literatuur.md /home/$USERNAME/.claude/commands/literatuur.md
-RUN chown -R $USERNAME:$USERNAME /home/$USERNAME/.claude \
-    && chown $USERNAME:$USERNAME /workspace/CLAUDE.md
+RUN chown -R $USERNAME:$USERNAME /home/$USERNAME/.claude
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
