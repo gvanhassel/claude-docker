@@ -26,6 +26,17 @@ if [ -n "$GIT_USER_EMAIL" ]; then
     su - claude -c "git config --global user.email '${GIT_USER_EMAIL}'"
 fi
 
+# GitHub token — configureert gh CLI en git automatisch
+if [ -n "$GITHUB_TOKEN" ]; then
+    echo "[entrypoint] GitHub token instellen..."
+    # gh CLI inloggen via token
+    echo "$GITHUB_TOKEN" | su - claude -c "gh auth login --with-token"
+    # git HTTPS pushes via token (geen wachtwoordprompt)
+    su - claude -c "git config --global credential.helper store"
+    su - claude -c "git config --global url.'https://oauth2:${GITHUB_TOKEN}@github.com/'.insteadOf 'https://github.com/'"
+    echo "[entrypoint] GitHub token geconfigureerd"
+fi
+
 # Tailscale opstarten als auth key aanwezig is
 if [ -n "$TAILSCALE_AUTH_KEY" ]; then
     echo "[entrypoint] Tailscale starten..."
