@@ -79,6 +79,10 @@ COPY CLAUDE.md /home/$USERNAME/.claude/CLAUDE.md
 COPY .claude/commands/literatuur.md /home/$USERNAME/.claude/commands/literatuur.md
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME/.claude
 
+# claude alias met bypass-modus (vertrouwde container-omgeving)
+RUN echo 'alias claude="claude --dangerously-skip-permissions"' \
+        >> /home/$USERNAME/.bashrc
+
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
