@@ -1,5 +1,56 @@
 # Projectcontext
 
+## Sessiestart — Projectkeuze
+
+**Dit is een Docker-omgeving. Voer dit uit aan het begin van elke nieuwe sessie:**
+
+1. Zoek bestaande projecten in `/workspace`:
+   ```bash
+   ls /workspace
+   ```
+
+2. Stel de gebruiker de volgende vraag:
+
+   > Ik zie de volgende projecten in `/workspace`:
+   > - `project-a`
+   > - `project-b`
+   >
+   > Wil je verder met een bestaand project, of een nieuw aanmaken?
+   > Typ een naam uit de lijst, of geef een GitHub-URL om te klonen.
+
+3. Op basis van het antwoord:
+   - **Bestaand project** → `cd /workspace/{naam}` en ga verder
+   - **Nieuwe GitHub repo** → `git clone {url} /workspace/{naam} && cd /workspace/{naam}`
+   - **Nieuw leeg project** → maak de map aan, `git init`, koppel remote
+
+## Git & GitHub in deze container
+
+Credentials worden automatisch ingesteld via omgevingsvariabelen bij het opstarten. Je hoeft **nooit handmatig in te loggen**.
+
+### Wat is al geconfigureerd
+| Wat | Hoe |
+|-----|-----|
+| Git naam & e-mail | Via `GIT_USER_NAME` en `GIT_USER_EMAIL` in `.env` |
+| GitHub CLI (`gh`) | Via `GITHUB_TOKEN` in `.env` — automatisch ingelogd |
+| Git push/pull | Via token — geen wachtwoordprompt |
+
+### Controleren
+```bash
+gh auth status          # toont ingelogd account
+git config --global -l  # toont naam, e-mail en credential config
+```
+
+### Repo klonen
+```bash
+git clone https://github.com/gebruiker/repo /workspace/repo
+cd /workspace/repo
+```
+
+### Troubleshooting
+Als `git push` of `gh` toch om een wachtwoord vraagt, is de `GITHUB_TOKEN` waarschijnlijk verlopen of mist een scope. Vernieuw de token op **github.com → Settings → Developer settings → Personal access tokens** met scopes `repo`, `workflow` en `read:org`.
+
+---
+
 ## Taal
 
 Projectdocumentatie is in het Nederlands.
