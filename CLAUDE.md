@@ -4,24 +4,30 @@
 
 **Dit is een Docker-omgeving. Voer dit uit aan het begin van elke nieuwe sessie:**
 
-1. Zoek bestaande projecten in `/workspace`:
+1. Haal tegelijk op:
+   - Lokale projecten in `/workspace`
+   - GitHub-repo's van de ingelogde gebruiker
    ```bash
    ls /workspace
+   gh repo list --limit 50 --json name,description,updatedAt --jq '.[] | "\(.name) — \(.description // "geen beschrijving")"'
    ```
 
-2. Stel de gebruiker de volgende vraag:
+2. Stel de gebruiker de volgende vraag, met beide lijsten:
 
-   > Ik zie de volgende projecten in `/workspace`:
-   > - `project-a`
-   > - `project-b`
+   > **Lokale projecten in `/workspace`:**
+   > 1. `project-a`
+   > 2. `project-b`
    >
-   > Wil je verder met een bestaand project, of een nieuw aanmaken?
-   > Typ een naam uit de lijst, of geef een GitHub-URL om te klonen.
+   > **Jouw GitHub-repo's (nog niet gekloned):**
+   > 3. `mijn-repo` — korte beschrijving
+   > 4. `ander-project` — korte beschrijving
+   >
+   > Kies een nummer, of typ `nieuw` om een leeg project aan te maken.
 
 3. Op basis van het antwoord:
-   - **Bestaand project** → `cd /workspace/{naam}` en ga verder
-   - **Nieuwe GitHub repo** → `git clone {url} /workspace/{naam} && cd /workspace/{naam}`
-   - **Nieuw leeg project** → maak de map aan, `git init`, koppel remote
+   - **Lokaal project gekozen** → `cd /workspace/{naam}` en ga verder
+   - **GitHub-repo gekozen** → `git clone https://github.com/{gebruiker}/{naam} /workspace/{naam} && cd /workspace/{naam}`
+   - **`nieuw`** → vraag naam en GitHub-URL, maak map aan, `git init`, koppel remote
 
 ## Git & GitHub in deze container
 
