@@ -61,6 +61,74 @@ Als `git push` of `gh` toch om een wachtwoord vraagt, is de `GITHUB_TOKEN` waars
 
 Projectdocumentatie is in het Nederlands.
 
+## Werkhouding bij coderen
+
+Gedragsregels om veelgemaakte LLM-fouten te beperken. Voor triviale taken: gebruik je oordeel.
+
+**Trade-off:** deze regels neigen naar zorgvuldigheid boven snelheid.
+
+### 1. Eerst denken, dan coderen
+
+**Geen aannames. Geen verborgen twijfel. Maak trade-offs zichtbaar.**
+
+Voordat je begint te bouwen:
+- Benoem aannames expliciet. Bij onzekerheid: vraag.
+- Zijn er meerdere interpretaties? Leg ze voor — kies niet stilletjes.
+- Bestaat er een eenvoudigere aanpak? Zeg dat. Geef terecht weerwoord.
+- Is iets onduidelijk? Stop. Benoem wat verwart. Vraag.
+
+### 2. Eenvoud eerst
+
+**Minimale code die het probleem oplost. Niets speculatiefs.**
+
+- Geen features buiten wat is gevraagd.
+- Geen abstracties voor eenmalige code.
+- Geen "flexibiliteit" of "configureerbaarheid" die niet is gevraagd.
+- Geen errorhandling voor scenario's die niet kunnen optreden.
+- Schrijf je 200 regels en kan het in 50? Herschrijf.
+
+Toets: "Zou een senior engineer dit overgecompliceerd vinden?" Zo ja → simplificeer.
+
+### 3. Chirurgische wijzigingen
+
+**Raak alleen aan wat moet. Ruim alleen je eigen rommel op.**
+
+Bij het bewerken van bestaande code:
+- Geen "verbeteringen" aan aangrenzende code, comments of formatting.
+- Geen refactor van wat niet stuk is.
+- Volg bestaande stijl, ook als je het zelf anders zou doen.
+- Zie je niet-gerelateerde dode code? Meld het — verwijder het niet.
+
+Als jouw wijziging iets onbruikt maakt:
+- Verwijder imports/variabelen/functies die *door jouw wijziging* onbruikt zijn.
+- Verwijder geen al bestaande dode code, tenzij gevraagd.
+
+Toets: elke gewijzigde regel moet direct te herleiden zijn naar de vraag van de gebruiker.
+
+### 4. Doelgerichte uitvoering
+
+**Definieer succescriteria. Itereer tot ze verifieerbaar groen zijn.**
+
+Vertaal taken naar verifieerbare doelen:
+- "Validatie toevoegen" → "Schrijf tests voor ongeldige invoer, maak ze groen"
+- "Bug oplossen" → "Schrijf een test die de bug reproduceert, maak hem groen"
+- "X refactoren" → "Tests groen vóór en na de wijziging"
+
+Voor taken met meerdere stappen: benoem kort het plan:
+```
+1. [Stap] → verificatie: [check]
+2. [Stap] → verificatie: [check]
+3. [Stap] → verificatie: [check]
+```
+
+Sterke succescriteria laten je zelfstandig itereren. Zwakke criteria ("zorg dat het werkt") leveren constante terugvragen op. Voor de concrete test-eerst-volgorde bij nieuwe code: zie [Testen — Werkwijze](#testen--werkwijze) verderop.
+
+---
+
+**Deze regels werken als:** minder onnodige wijzigingen in diffs, minder herschrijfwerk door overcomplicatie, en verhelderingsvragen *vóór* implementatie in plaats van na fouten.
+
+---
+
 ## Ontwikkeling & GitHub Issues — Werkwijze
 
 Elke codewijziging is gekoppeld aan een GitHub issue. Dit is de vaste werkwijze:
@@ -81,27 +149,35 @@ gh issue create --title "..." --body "..." --label "..."
 | `research` | Onderzoek of verkenning, nog geen code |
 | `chore` | Onderhoud, dependencies, CI/CD |
 
-### 2. Branch + worktree per issue
-Werk op een branch die verwijst naar het issue, en gebruik een **worktree** zodat `main` onaangeraakt blijft en er parallel aan meerdere issues gewerkt kan worden.
+### 2. Branch per issue
+Werk per issue op een aparte feature-branch zodat `main` onaangeraakt blijft en er parallel aan meerdere issues gewerkt kan worden.
 
 **Stappen:**
-1. Maak een worktree aan via de ingebouwde `EnterWorktree`-tool:
+1. Zorg dat `main` up-to-date is en maak een nieuwe branch aan:
+   ```bash
+   git checkout main
+   git pull
+   git checkout -b issue-42-korte-beschrijving
    ```
-   EnterWorktree(name="issue-42-korte-beschrijving")
+2. Werk op die branch — commits, bewerkingen en pushes gebeuren allemaal hier.
+3. Push de branch en open een Pull Request:
+   ```bash
+   git push -u origin issue-42-korte-beschrijving
+   gh pr create --fill
    ```
-   Dit maakt automatisch een nieuwe branch aan en schakelt de hele Claude Code-sessie om naar de worktree-directory (`.claude/worktrees/`).
-2. Vanaf dat moment werk je in de worktree — alle bestanden, commits en bewerkingen vinden daar plaats.
-3. Na afronding (PR gemerged): **verwijder altijd de worktree** via `ExitWorktree(action="remove", discard_changes=true)`.
-   De code zit veilig in `main` na de merge — de worktree is dan overbodig.
-   Wil je later terugkomen (werk nog niet af): `ExitWorktree(action="keep")`.
+4. Na merge: schakel terug naar `main`, trek de wijzigingen op en verwijder de branch lokaal:
+   ```bash
+   git checkout main
+   git pull
+   git branch -d issue-42-korte-beschrijving
+   ```
 
-**Naamconventie worktree/branch:** `issue-{nummer}-{korte-beschrijving}`
+**Naamconventie branch:** `issue-{nummer}-{korte-beschrijving}`
 
 **Belangrijk:**
-- Werk **nooit** direct op `main` — altijd via een worktree
-- Elke nieuwe programmeeropdracht → nieuw issue → nieuwe worktree
-- Na merge → worktree verwijderen (opruimen)
-- Bij het openen van een bestaande worktree: gebruik `EnterWorktree` om de sessie naar die directory te verplaatsen
+- Werk **nooit** direct op `main` — altijd via een feature-branch
+- Elke nieuwe programmeeropdracht → nieuw issue → nieuwe branch
+- Na merge → lokale branch opruimen met `git branch -d`
 
 ### 3. Conventional Commits
 Elk commit-bericht volgt de [Conventional Commits](https://www.conventionalcommits.org/) standaard:
